@@ -19,7 +19,7 @@ INITIAL_MESSAGE = [
 
                     Each visitor will be able to have 25 question & answers per day due to this app being public. We hope this will be
                     enough to get you excited for what the full Agent Neo has to offer!
-                    
+
                     If you're interested in learning more please read our Medium article in the sidebar.
                     """,
     },
@@ -51,6 +51,7 @@ try:
 
     st.title("Agent Neo")
     st.sidebar.markdown("# Agent Neo")
+    st.sidebar.markdown("Read more: [The Practical Benefits to Grounding an LLM in a Knowledge Graph](https://medium.com/@bukowski.daniel/the-practical-benefits-to-grounding-an-llm-in-a-knowledge-graph-919918eb493)")
 
     # check for openai key
     # if 'user_openai_key_validated' not in st.session_state or not st.session_state['user_openai_key_validated']:

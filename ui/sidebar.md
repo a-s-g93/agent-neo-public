@@ -1,4 +1,7 @@
-Agent Neo is a virtual assistant that helps users with their graph data science problems. Feel free to ask any questions you may have related to GDS!
+Agent Neo has three main purposes 
+- To help colleagues use the Neo4j Graph Data Science library more effectively
+- To develop best practices for grounding an LLM in a knowledge graph
+- To use the knowledge graph and graph data science algorithms to analyze performance
 
 ## Features
 
