@@ -2,6 +2,7 @@
 google_token.txt
 .DS_store
 .streamlit/
+*.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
