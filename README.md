@@ -1,2 +1,10 @@
 # Agent-Neo
-Repo for the project to create an LLM-enhanced Chat Agent to support customers and employees working with Neo4j Graph Data Science
+
+Agent Neo has three main purposes 
+- To help colleagues use the Neo4j Graph Data Science library more effectively
+- To develop best practices for grounding an LLM in a knowledge graph
+- To use the knowledge graph and graph data science algorithms to analyze performance.
+
+Agent Neo allows users to alter different aspects of LLM behavior with all parameters and messages being logged in a Neo4j graph database for analysis. Agent Neo is grounded in Graph Data Science. 
+
+Learn more about our work with Agent Neo with our Medium post: [Link text](https://website-name.com)
