@@ -4,6 +4,7 @@ from communicator import Communicator
 from credentials import validate_openai_key
 import time
 import uuid
+from ratelimit import RateLimitException
 
 llm_avatar = 'images/neo4j_icon_white.png'
 user_avatar = '👤'
@@ -15,6 +16,11 @@ INITIAL_MESSAGE = [
         "content": """
                     Hey there, I'm Agent Neo!
                     What Graph Data Science question can I answer for you?
+
+                    Each visitor will be able to have 25 question & answers per day due to this app being public. We hope this will be
+                    enough to get you excited for what the full Agent Neo has to offer!
+                    
+                    If you're interested in learning more please read our Medium article in the sidebar.
                     """,
     },
 ]
@@ -47,8 +53,8 @@ try:
     st.sidebar.markdown("# Agent Neo")
 
     # check for openai key
-    if 'user_openai_key' not in st.session_state:
-        st.session_state['user_openai_key'] = st.text_input('Please enter OpenAI key to use Agent Neo')
+    # if 'user_openai_key_validated' not in st.session_state or not st.session_state['user_openai_key_validated']:
+    #     st.session_state['user_openai_key'] = st.text_input('Please enter OpenAI key to use Agent Neo')
 
     # init session if first visit
     if len(st.session_state.keys()) == 0:
@@ -71,12 +77,12 @@ try:
                                          ''')
     
     # Add slider to select the number of documents to use as context
-    use_context = st.sidebar.toggle('Use Context?', value=True, help='Use the Neo4j knowledge graph to provide context to Agent Neo.')
+    use_context = st.sidebar.toggle('Use Grounding?', value=True, help='Use the Neo4j knowledge graph to ground Agent Neo.')
     if use_context:
-        st.session_state['num_documents_for_context'] = st.sidebar.slider('Select Number of Documents Used in Context', 1, 10, 10, 
+        st.session_state['num_documents_for_context'] = st.sidebar.slider('Select Number of Context Documents', 1, 10, 10, 
                                                                       help='''
-                                                                            More documents will provide potentially better context for a response 
-                                                                            at the cost of longer prompts and possibly longer processing time. This
+                                                                            More documents could provide better context for a response 
+                                                                            at the cost of longer prompts and processing time. This
                                                                             value can vary throughout a conversation.
                                                                             ''',
                                                                             disabled=not use_context)
@@ -96,11 +102,6 @@ try:
         st.session_state["history"] = []
         st.session_state['temperature'] = temperature
 
-    # Initialize the chat messages history
-    if "messages" not in st.session_state:
-        st.session_state["messages"] = INITIAL_MESSAGE
-        st.chat_message("assistant", avatar=llm_avatar).markdown(INITIAL_MESSAGE['content'])
-
     # Add buttons to rate most recent LLM repsonse
     if 'communicator' in st.session_state:
         st.sidebar.write('<p class="sidebar-font">Rate Recent LLM Response</p>', unsafe_allow_html=True)
@@ -115,20 +116,30 @@ try:
     st.sidebar.markdown(sidebar_content)
 
     #VALIDATE OPENAI KEY after sidebar content has loaded
-    if not st.session_state['user_openai_key']:
-        st.warning("Please enter your OpenAI key to use Agent Neo")
-        st.stop()
+    # if not st.session_state['user_openai_key']:
+    #     st.warning("Please enter your OpenAI key to use Agent Neo.")
+    #     st.stop()
+    # elif not st.session_state['user_openai_key_validated']:
+    #     st.warning("OpenAI key not valid. Try again.")
+    #     st.stop()
     
-    if 'user_openai_key_validated' not in st.session_state:
-        st.session_state['user_openai_key_validated'] = validate_openai_key()
+    # # openai key check
+    # if 'user_openai_key_validated' not in st.session_state or not st.session_state['user_openai_key_validated']:
+    #     st.session_state['user_openai_key_validated'] = validate_openai_key()
 
-    if not st.session_state['user_openai_key_validated']:
-        st.session_state['user_openai_key'] = None
-        st.session_state['user_openai_key_validated'] = None
+    # if not st.session_state['user_openai_key_validated']:
+    #     st.session_state['user_openai_key'] = None
+    #     st.session_state['user_openai_key_validated'] = False
+    #     st.experimental_rerun()
 
     # init Communicator object
     if 'communicator' not in st.session_state:
         st.session_state['communicator'] = Communicator()
+
+    # Initialize the chat messages history
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = INITIAL_MESSAGE
+        st.chat_message("assistant", avatar=llm_avatar).markdown(INITIAL_MESSAGE['content'])
 
     # Initialize the LLM conversation
     if "llm_conversation" not in st.session_state:
@@ -177,7 +188,7 @@ try:
 
         with st.chat_message('assistant', avatar=llm_avatar):
             message_placeholder = st.empty()
-            message_placeholder.markdown('thinking...')
+            message_placeholder.status('thinking...')
 
             # start "thinking" timer
             run_timer_start = time.perf_counter()
@@ -208,13 +219,23 @@ except URLError as e:
     """
         % e.reason
     )
-# except Exception as e:
-#     print(e)
-#     st.error(
-#         """
-#         Error occurred: %s
-#         """
-#         % e
-#     )
+except RateLimitException as e:
+    print(e)
+    st.error(
+        """
+        Error occurred: %s \n
+        You are allowed only so many calls per day. \n 
+        Please wait for your rate limit to reset.
+        """
+        % e
+    )
+except Exception as e:
+    print(e)
+    st.error(
+        """
+        Error occurred: %s
+        """
+        % e
+    )
 
 

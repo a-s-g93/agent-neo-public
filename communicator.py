@@ -1,7 +1,6 @@
 from neo4j.exceptions import ConstraintError
 from google.oauth2 import service_account
 from google.cloud import aiplatform
-# import os
 import streamlit as st
 import drivers
 from typing import List, Optional
@@ -9,24 +8,18 @@ from graphdatascience import GraphDataScience
 from credentials import neo4j_credentials
 
 from vertexai.preview.language_models import TextEmbeddingModel
-# import vertexai
 
 from langchain.chat_models import ChatVertexAI
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationSummaryBufferMemory
-
-# from langchain.llms import VertexAI
-
-from langchain.prompts import (
-    FewShotChatMessagePromptTemplate,
-    ChatPromptTemplate,
-)
 
 import time
 import uuid
 
 import openai
 from langchain.chat_models import AzureChatOpenAI
+
+from ratelimit import limits, RateLimitException, sleep_and_retry
 
 EMBEDDING_DIMENSIONS = 768
 TEXT_EMBEDDING_MODEL = "textembedding-gecko@001"
@@ -96,6 +89,8 @@ class Communicator:
 
             session.close()
     
+    # 25 calls / 20 hours
+    @limits(calls=25, period=72000)
     def encode_texts_to_embeddings(self, sentences: List[str]) -> List[Optional[List[float]]]:
         try:
             embeddings = self.text_embedding_model.get_embeddings(sentences)
