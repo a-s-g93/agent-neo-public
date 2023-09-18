@@ -7,4 +7,4 @@ Agent Neo has three main purposes
 
 Agent Neo allows users to alter different aspects of LLM behavior with all parameters and messages being logged in a Neo4j graph database for analysis. Agent Neo is grounded in Graph Data Science. 
 
-Learn more about our work with Agent Neo with our Medium post: [Link text](https://website-name.com)
+Learn more about our work with Agent Neo with our Medium post: [The Practical Benefits to Grounding an LLM in a Knowledge Graph](https://medium.com/@bukowski.daniel/the-practical-benefits-to-grounding-an-llm-in-a-knowledge-graph-919918eb493)
