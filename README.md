@@ -1,5 +1,4 @@
 # Agent-Neo
-# NOTE: The current build uses a version of LangChain with security vulnerabilities made known on 10/5. An updated build will be uploaded shortly, but in the meantime be cautious of publishing an application based on this repo.
 
 Agent Neo has three main purposes 
 - To help colleagues use the Neo4j Graph Data Science library more effectively
